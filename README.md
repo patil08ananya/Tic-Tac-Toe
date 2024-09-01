@@ -1,5 +1,5 @@
 # Tic-Tac-Toe
-Tic-Tac-Toe game using minimax algorithm
+This Tic-Tac-Toe game uses minimax algorithm to make an intelligent opponent AI which never loses !!
 
 The board will look like this:
 

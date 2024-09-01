@@ -8,7 +8,7 @@ pygame.init()
 
 #colors
 WHITE = (255, 255, 255) # default color
-GRAY = (180,180,180) #tile
+GRAY = (100,100,100) #tie
 RED = (255, 0, 0) #lose
 GREEN = (0, 255, 0) #win
 BLACK = (0, 0, 0) #background
@@ -60,19 +60,22 @@ def is_board_full(check_board = board):
     for row in range(BOARD_ROWS):
         for col in range(BOARD_COLS):
             if check_board[row][col] == 0:
-                return True
-    return False
+                return False
+    return True
 
 def check_win(player, check_board=board):
     for col in range(BOARD_COLS):
-        if check_board[0][col] == player and check_board[1][col] == player and check_board[1][col] == player:
+        if check_board[0][col] == player and check_board[1][col] == player and check_board[2][col] == player:
             return True
 
     for row in range(BOARD_ROWS):
-        if check_board[row][0] == player and check_board[row][1] == player and check_board[row][1] == player:
+        if check_board[row][0] == player and check_board[row][1] == player and check_board[row][2] == player:
             return True
 
-    if (check_board[0][0] == player and check_board[1][1] == player and check_board[2][2] == player) or (check_board[0][2] == player and check_board[1][1] == player and check_board[2][0] == player):
+    if check_board[0][0] == player and check_board[1][1] == player and check_board[2][2] == player:
+        return True
+
+    if check_board[0][2] == player and check_board[1][1] == player and check_board[2][0] == player:
         return True
 
     return False
@@ -111,7 +114,7 @@ def minimax(minimax_board, depth, is_maximizing):
 
 
 
-def best_score():
+def best_move():
     best_score = -1000
     move = (-1,-1)
     for row in range(BOARD_ROWS):
@@ -135,6 +138,60 @@ def restart_game():
     for row in range(BOARD_ROWS):
         for col in range(BOARD_COLS):
             board[row][col] = 0
+
+
+draw_lines()
+
+player = 1
+game_over= False
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            sys.exit()
+
+        if event.type == pygame.MOUSEBUTTONDOWN and not game_over: #when we click
+            mouse_x = event.pos[0] // SQUARE_SIZE
+            mouse_y = event.pos[1] // SQUARE_SIZE
+
+            if available_square(mouse_y, mouse_x):
+                mark_square(mouse_y, mouse_x, player)
+                if check_win(player):
+                    game_over = True
+
+                player = player % 2 + 1  #turn a 1 into 2 and 2 into 1
+
+                if not game_over:
+                    if best_move():
+                        if check_win(2):
+                            game_over = True
+                        player = player % 2 + 1
+
+                if not game_over:
+                    if is_board_full(board):
+                        game_over = True
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_r:
+                restart_game()
+                game_over= False
+                player = 1
+
+    if not game_over:
+        draw_figures()
+    else:
+        if check_win(1):
+            draw_figures(GREEN)
+            draw_lines(GREEN)
+        elif check_win(2):
+            draw_figures(RED)
+            draw_lines(RED)
+        else:
+            draw_figures(GRAY)
+            draw_lines(GRAY)
+
+    pygame.display.update()
+
 
 
 
